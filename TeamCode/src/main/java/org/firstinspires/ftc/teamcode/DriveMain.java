@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -61,7 +62,9 @@ public class DriveMain extends OpMode
     private DcMotor rightRear = null;
     private DcMotor leftFront = null;
     private DcMotor rightFront = null;
-    private Foundation foundation = null;
+   // private Foundation foundation = null;
+    private Servo foundRight = null;
+    private Servo foundLeft = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -73,13 +76,16 @@ public class DriveMain extends OpMode
         rightRear = hardwareMap.get(DcMotor.class, "backRight");
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
         rightFront = hardwareMap.get(DcMotor.class, "frontRight");
+
+        foundLeft = hardwareMap.get(Servo.class, "foundLeft");
+        foundRight = hardwareMap.get(Servo.class, "foundRight");
         
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
 
-        foundation = new Foundation(hardwareMap);
+        //foundation = new Foundation(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -115,12 +121,18 @@ public class DriveMain extends OpMode
         leftFront.setPower(lf + turn);
         rightFront.setPower(rf - turn);
 
-        if(gamepad2.right_bumper){
-            foundation.moveDown();
+        if(gamepad1.a){
+            foundLeft.setPosition(0);
+            foundRight.setPosition(0);
+            telemetry.addData("Foundation Servo Position","Down");
         }
-        if(gamepad2.left_bumper){
-            foundation.moveUp();
+        else if(gamepad1.b){
+            foundLeft.setPosition(.9);
+            foundRight.setPosition(-.9);
+            telemetry.addData("Foundation Servo Position","Up");
         }
+   
+        telemetry.update();
     }
 
     /*

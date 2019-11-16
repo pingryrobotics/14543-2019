@@ -18,5 +18,9 @@ public class Foundation {
         foundLeft.setPosition(-.9);
         foundRight.setPosition(.9);
     }
+    public double[] getServoPositions(){
+        double[] arr = {foundLeft.getPosition(),foundRight.getPosition()};
+        return arr;
+    }
 
 }
