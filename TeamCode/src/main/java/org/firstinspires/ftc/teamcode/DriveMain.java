@@ -61,6 +61,7 @@ public class DriveMain extends OpMode
     private DcMotor rightRear = null;
     private DcMotor leftFront = null;
     private DcMotor rightFront = null;
+    private Foundation foundation = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -77,7 +78,8 @@ public class DriveMain extends OpMode
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
-        
+
+        foundation = new Foundation(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -109,9 +111,16 @@ public class DriveMain extends OpMode
         double rb = Math.sin(theta - (Math.PI/4)) * magnitude;
         double lb = Math.sin(theta + (Math.PI/4)) * magnitude;
         leftRear.setPower(lb + turn);
-           rightRear.setPower(rb - turn);
-           leftFront.setPower(lf + turn);
-           rightFront.setPower(rf - turn);
+        rightRear.setPower(rb - turn);
+        leftFront.setPower(lf + turn);
+        rightFront.setPower(rf - turn);
+
+        if(gamepad2.right_bumper){
+            foundation.moveDown();
+        }
+        if(gamepad2.left_bumper){
+            foundation.moveUp();
+        }
     }
 
     /*
