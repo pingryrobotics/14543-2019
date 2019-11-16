@@ -112,7 +112,6 @@ public class DriveMain extends OpMode
            rightRear.setPower(rb - turn);
            leftFront.setPower(lf + turn);
            rightFront.setPower(rf - turn);
-
     }
 
     /*
