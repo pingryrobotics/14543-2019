@@ -121,17 +121,18 @@ public class DriveMain extends OpMode
         leftFront.setPower(lf + turn);
         rightFront.setPower(rf - turn);
 
-        if(gamepad1.a){
-            foundLeft.setPosition(0);
-            foundRight.setPosition(0);
+        if(gamepad1.right_bumper){
+            foundLeft.setPosition(.5);
+            foundRight.setPosition(.5);
             telemetry.addData("Foundation Servo Position","Down");
         }
-        else if(gamepad1.b){
+        else if(gamepad1.left_bumper){
             foundLeft.setPosition(.9);
-            foundRight.setPosition(-.9);
+            foundRight.setPosition(.1);
             telemetry.addData("Foundation Servo Position","Up");
         }
-   
+        telemetry.addData("Left Servo Position", foundLeft.getPosition());
+        telemetry.addData("Right Servo Position", foundRight.getPosition());
         telemetry.update();
     }
 
