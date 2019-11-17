@@ -53,16 +53,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "DriveMain", group = "Iterative Opmode")
-public class DriveMain extends OpMode
+@TeleOp(name = "servo test", group = "Iterative Opmode")
+public class ServosAreBroken extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-     private DcMotor leftRear = null;
-    private DcMotor rightRear = null;
-    private DcMotor leftFront = null;
-    private DcMotor rightFront = null;
-   // private Foundation foundation = null;
     private Servo foundRight = null;
     private Servo foundLeft = null;
 
@@ -71,19 +66,9 @@ public class DriveMain extends OpMode
      */
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
-        leftRear = hardwareMap.get(DcMotor.class, "backLeft");
-        rightRear = hardwareMap.get(DcMotor.class, "backRight");
-        leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
-        rightFront = hardwareMap.get(DcMotor.class, "frontRight");
 
         foundLeft = hardwareMap.get(Servo.class, "foundLeft");
         foundRight = hardwareMap.get(Servo.class, "foundRight");
-        
-        leftRear.setDirection(DcMotor.Direction.FORWARD);
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
 
         //foundation = new Foundation(hardwareMap);
         telemetry.addData("Status", "Initialized");
@@ -109,31 +94,8 @@ public class DriveMain extends OpMode
      */
     @Override
     public void loop() {
-        double theta = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x);
-        double magnitude = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2));
-        double turn = -Range.clip(gamepad1.right_stick_x, -1, 1);
-        double rf = Math.sin(theta + (Math.PI/4)) * magnitude;
-        double lf = Math.sin(theta - (Math.PI/4)) * magnitude;
-        double rb = Math.sin(theta - (Math.PI/4)) * magnitude;
-        double lb = Math.sin(theta + (Math.PI/4)) * magnitude;
-        leftRear.setPower(lb + turn);
-        rightRear.setPower(rb - turn);
-        leftFront.setPower(lf + turn);
-        rightFront.setPower(rf - turn);
-
-        if(gamepad1.a){
-            foundLeft.setPosition(.5);
-            foundRight.setPosition(.5);
-            telemetry.addData("Foundation Servo Position","Down");
-        }
-        if(gamepad1.b){
-            foundLeft.setPosition(.9);
-            foundRight.setPosition(.1);
-            telemetry.addData("Foundation Servo Position","Up");
-        }
-        telemetry.addData("Left Servo Position", foundLeft.getPosition());
-        telemetry.addData("Right Servo Position", foundRight.getPosition());
-        telemetry.update();
+        foundLeft.setPosition(.9);
+        foundRight.setPosition(.1);
     }
 
     /*
@@ -141,11 +103,7 @@ public class DriveMain extends OpMode
      */
     @Override
     public void stop() {
-        leftRear.setPower(0);
-        leftFront.setPower(0);
-        rightRear.setPower(0);
-        rightFront.setPower(0);
     }
-   
+
 
 }
