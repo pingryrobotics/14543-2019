@@ -10,12 +10,12 @@ public class Foundation {
     }
 
     public void moveDown(){
-        foundLeft.setPosition(0);
-        foundRight.setPosition(0);
+        foundLeft.setPosition(.5);
+        foundRight.setPosition(.5);
     }
 
     public void moveUp(){
-        foundLeft.setPosition(-.9);
+        foundLeft.setPosition(.9);
         foundRight.setPosition(.9);
     }
     public double[] getServoPositions(){

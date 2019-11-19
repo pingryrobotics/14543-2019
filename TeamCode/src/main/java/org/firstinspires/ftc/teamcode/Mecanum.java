@@ -10,15 +10,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.robotcore.external.*;
+
+import static java.lang.Thread.*;
+import static java.lang.Thread.sleep;
 
 
 public class Mecanum {
-    private DcMotor rightRear = null;
-    private DcMotor rightFront = null;
-    private DcMotor leftRear = null;
-    private DcMotor leftFront = null;
-    
-    private final double ticksPerInch = (28*35)/(6* Math.PI);//28 / Math.PI;//1120 * 20 / (4 * Math.PI);
+    public DcMotor rightRear = null;
+    public DcMotor rightFront = null;
+    public DcMotor leftRear = null;
+    public DcMotor leftFront = null;
+
+    private final double ticksPerInch = 28*25/(4*Math.PI);//encoder ticks to inches: 2 * 2pi * 1/25 * ticks/28 ;//28 / Math.PI;//1120 * 20 / (4 * Math.PI);
 
     public BNO055IMU imu;
 
@@ -26,20 +30,20 @@ public class Mecanum {
     private double averageVelocity = 0;
     private double averageGoal = 0;
     private ElapsedTime t;
-    
-    
+
+
     public Mecanum(HardwareMap h){
-        
+
         rightRear = h.get(DcMotor.class, "backRight");
         leftFront = h.get(DcMotor.class, "frontLeft");
         rightFront = h.get(DcMotor.class, "frontRight");
         leftRear = h.get(DcMotor.class, "backLeft");
-        
+
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -49,6 +53,7 @@ public class Mecanum {
 
         t = new ElapsedTime();
     }
+
     public void move(Gamepad gamepad){
         /*double theta = Math.atan2(gamepad.left_stick_x, gamepad.left_stick_y)+(Math.PI/4);
         double r = Range.clip(Math.hypot(gamepad.left_stick_x,gamepad.left_stick_y),-1,1);
@@ -65,13 +70,13 @@ public class Mecanum {
         double fl = Math.sin(theta-(Math.PI/4))*magnitude;
         double br = Math.sin(theta-(Math.PI/4))*magnitude;
         double bl = Math.sin(theta+(Math.PI/4))*magnitude;
-        
+
         leftRear.setPower(bl + turn);
         rightRear.setPower(br - turn);
         leftFront.setPower(fl + turn);
         rightFront.setPower(fr - turn);
     }
-     public void resetEncoders(){
+    public void resetEncoders(){
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -127,28 +132,29 @@ public class Mecanum {
         leftRear.setPower(power);
         rightRear.setPower(power);
     }
-    
+
     public void stop(){
         rightFront.setPower(0);
         leftFront.setPower(0);
         rightRear.setPower(0);
         leftRear.setPower(0);
     }
-    
-     /**
+
+    /**
      * Move robot forward/backwards using encoders
      * @param inches # of inches to move (negative is backwards)
      * @param power Positive power to move the motors
      */
-    public void moveEncoderStraight(double inches, double power){
+    public void moveEncoderStraight(double inches, double power) throws InterruptedException {
         power = Math.abs(power);
 
         resetEncoders();
+        //Thread.sleep(1000);
 
-        leftFront.setTargetPosition((int) (inches * ticksPerInch));
-        rightFront.setTargetPosition((int) (inches * ticksPerInch));
-        leftRear.setTargetPosition((int) (inches * ticksPerInch));
-        rightRear.setTargetPosition((int) (inches * ticksPerInch));
+        leftFront.setTargetPosition((int) (inches*ticksPerInch));
+        rightFront.setTargetPosition((int) (inches*ticksPerInch));
+        leftRear.setTargetPosition((int) (inches*ticksPerInch));
+        rightRear.setTargetPosition((int) (inches*ticksPerInch));
 
         leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -164,13 +170,18 @@ public class Mecanum {
         rightRear.setPower(power);
     }
 
+    public double rightRearEncoderPosition(){
+        return rightRear.getCurrentPosition();
+    }
     /**
      * Turn an amount of degrees using encoders
      * @param degrees
      * @param power
      */
+
+
     @Deprecated
-    public void encoderTurn(double degrees, double power){
+    public void encoderTurn(double degrees, double power) throws InterruptedException {
         boolean turnRight = degrees > 0;
         power = Math.abs(power);
 
@@ -274,6 +285,8 @@ public class Mecanum {
         rightFront.setPower(v2);
         leftRear.setPower(v3);
         rightRear.setPower(v4);
+
+
     }
 
 }
