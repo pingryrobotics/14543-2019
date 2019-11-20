@@ -53,28 +53,54 @@ import com.qualcomm.robotcore.util.Range;
 
 @Autonomous(name="Move FoundationAuto")
 
-public class MoveFoundationAuto extends LinearOpMode {
+public class RedMoveFoundationAuto extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private Mecanum mecanum;
+    private Foundation foundation;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Starting...");
         telemetry.update();
         mecanum = new Mecanum(hardwareMap);
+        foundation = new Foundation(hardwareMap);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        mecanum.moveStrafe(10,.3);
+        waitForEncoders();
+        mecanum.moveEncoderStraight(33,.4);
+        waitForEncoders();
+        foundation.moveDown();
+        twait(500);
+        mecanum.moveEncoderStraight(-33,.4);
+        waitForEncoders();
+        foundation.moveUp();
+        mecanum.rawMove(.2,.2,.2,.2);
+        twait(300);
+        mecanum.stop();
 
-        mecanum.moveEncoderStraight(12,.5);
+        mecanum.moveStrafe(-44,.3);
+        waitForEncoders();
 
         telemetry.addData("rightRear encoder position", mecanum.rightRearEncoderPosition());
+        telemetry.addData("target pos", mecanum.targetPosition(12));
         telemetry.update();
 
     }
     public void twait(long millis) throws InterruptedException{
         Thread.sleep(millis);
+    }
+    public boolean timedout(long millis){
+
+        boolean x =  runtime.milliseconds()>millis;
+        return x;
+    }
+
+    public void waitForEncoders(){
+        while(!mecanum.encoderDone()&&opModeIsActive());
+        mecanum.resetEncoders();
     }
 }

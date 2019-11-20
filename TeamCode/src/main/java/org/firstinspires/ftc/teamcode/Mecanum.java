@@ -54,6 +54,9 @@ public class Mecanum {
         t = new ElapsedTime();
     }
 
+    public double targetPosition(double inches){
+        return inches*ticksPerInch;
+    }
     public void move(Gamepad gamepad){
         /*double theta = Math.atan2(gamepad.left_stick_x, gamepad.left_stick_y)+(Math.PI/4);
         double r = Range.clip(Math.hypot(gamepad.left_stick_x,gamepad.left_stick_y),-1,1);
@@ -288,5 +291,6 @@ public class Mecanum {
 
 
     }
+
 
 }
