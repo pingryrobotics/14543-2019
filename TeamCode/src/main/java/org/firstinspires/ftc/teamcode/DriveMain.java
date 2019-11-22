@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "BlankTest", group = "Iterative Opmode")
 public class DriveMain extends OpMode {
     private Foundation foundation;
+    private Intake intake;
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftRear = null;
     private DcMotor rightRear = null;
@@ -17,6 +19,7 @@ public class DriveMain extends OpMode {
     private DcMotor rightFront = null;
     public void init(){
         foundation = new Foundation(hardwareMap);
+        intake = new Intake(hardwareMap);
         leftRear = hardwareMap.get(DcMotor.class, "leftBack");
         rightRear = hardwareMap.get(DcMotor.class, "rightBack");
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
@@ -25,10 +28,10 @@ public class DriveMain extends OpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftRear.setDirection(DcMotor.Direction.FORWARD);
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
 
         telemetry.addData("Status","Initialized");
 
@@ -46,6 +49,25 @@ public class DriveMain extends OpMode {
         rightRear.setPower(rb - turn);
         leftFront.setPower(lf + turn);
         rightFront.setPower(rf - turn);
+
+        if(gamepad1.y){
+            foundation.moveUp();
+        }
+        else if(gamepad1.b){
+            foundation.moveDown();
+        }
+        else if(gamepad1.right_bumper){
+            intake.moveRampUp();
+        }
+        else if(gamepad1.left_bumper){
+            intake.moveRampDown();
+        }
+        while(gamepad1.right_trigger >= 0.3){
+            intake.intake(gamepad1.right_trigger);
+        }
+        while(gamepad1.left_trigger >= 0.3){
+            intake.outtake(gamepad1.left_trigger);
+        }
 
 
         telemetry.update();

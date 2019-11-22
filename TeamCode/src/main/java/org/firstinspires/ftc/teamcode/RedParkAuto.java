@@ -51,42 +51,21 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="RedMoveFoundationAuto")
+@Autonomous(name="RedParkAuto")
 
-public class RedMoveFoundationAuto extends LinearOpMode {
+public class RedParkAuto extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private Mecanum mecanum;
-    private Foundation foundation;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Starting...");
         telemetry.update();
         mecanum = new Mecanum(hardwareMap);
-        foundation = new Foundation(hardwareMap);
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
-        mecanum.moveStrafe(10,.3);
+        mecanum.moveStrafe(24,.4);
         waitForEncoders();
-        mecanum.moveEncoderStraight(33,.4);
-        waitForEncoders();
-        foundation.moveDown();
-        twait(500);
-        mecanum.moveEncoderStraight(-33,.4);
-        waitForEncoders();
-        foundation.moveUp();
-        mecanum.rawMove(.2,.2,.2,.2);
-        twait(300);
-        mecanum.stop();
-
-        mecanum.moveStrafe(-44,.3);
-        waitForEncoders();
-
-        telemetry.addData("rightRear encoder position", mecanum.rightRearEncoderPosition());
-        telemetry.addData("target pos", mecanum.targetPosition(12));
         telemetry.update();
 
     }
