@@ -14,10 +14,10 @@ public class Intake {
     }
 
     public void moveRampUp(){
-        ramp.setPosition(.6);
+        ramp.setPosition(.8);
     }
     public void moveRampDown(){
-        ramp.setPosition(.2);
+        ramp.setPosition(.45);
     }
     public void intake(double power){
         left.setPower(power);
@@ -26,5 +26,9 @@ public class Intake {
     public void outtake(double power){
         left.setPower(power);
         right.setPower(power);
+    }
+    public void stop(){
+        left.setPower(0);
+        right.setPower(0);
     }
 }
