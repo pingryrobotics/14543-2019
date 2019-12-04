@@ -78,11 +78,14 @@ public class RedMoveFoundationAuto extends LinearOpMode {
         mecanum.moveEncoderStraight(-33,.4);
         waitForEncoders();
         foundation.moveUp();
+        /*
         mecanum.rawMove(.2,.2,.2,.2);
         twait(300);
         mecanum.stop();
 
-        mecanum.moveStrafe(-44,.3);
+         */
+
+        mecanum.moveStrafe(-49,.3);
         waitForEncoders();
 
         telemetry.addData("rightRear encoder position", mecanum.rightRearEncoderPosition());
@@ -100,7 +103,7 @@ public class RedMoveFoundationAuto extends LinearOpMode {
     }
 
     public void waitForEncoders(){
-        while(!mecanum.encoderDone()&&opModeIsActive());
+        while(!mecanum.threeEncoderDone()&&opModeIsActive());
         mecanum.resetEncoders();
     }
 }

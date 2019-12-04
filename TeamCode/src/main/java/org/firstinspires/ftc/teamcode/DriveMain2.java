@@ -17,6 +17,7 @@ public class DriveMain2 extends OpMode {
     private DcMotor rightRear = null;
     private DcMotor leftFront = null;
     private DcMotor rightFront = null;
+    private Servo stoneArm;
     public void init(){
         foundation = new Foundation(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -24,6 +25,8 @@ public class DriveMain2 extends OpMode {
         rightRear = hardwareMap.get(DcMotor.class, "backRight");
         leftFront = hardwareMap.get(DcMotor.class, "frontLeft");
         rightFront = hardwareMap.get(DcMotor.class, "frontRight");
+
+        stoneArm = hardwareMap.get(Servo.class, "stoneArm");
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -37,9 +40,33 @@ public class DriveMain2 extends OpMode {
 
     }
     public void loop(){
+        //direction Right Stick x/y
+        //turn Left Stick x
+//Normal drive
+/*
         double theta = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x);
         double magnitude = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2));
         double turn = Range.clip(gamepad1.right_stick_x, -1, 1);
+*/
+//Deadband drive
+
+        double deadband = .1;
+        double xInput = 0;
+        double yInput = 0;
+        double theta = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x);
+        if(Math.abs(gamepad1.left_stick_x) < deadband){
+            xInput = 0;
+        }
+        else{
+            xInput = Math.signum(gamepad1.left_stick_x)*(Math.abs(gamepad1.left_stick_x)-deadband)/(1-deadband);
+        }
+        if(Math.abs(gamepad1.left_stick_y)<deadband){yInput = 0;}
+        else{
+            yInput = Math.signum(gamepad1.left_stick_y)*(Math.abs(gamepad1.left_stick_y)-deadband)/(1-deadband);
+        }
+        double magnitude = Math.sqrt(Math.pow(xInput,2) + Math.pow(yInput,2));
+        double turn = Range.clip(gamepad1.right_stick_x,-1,1);
+
         double rf = Math.sin(theta + (Math.PI/4)) * magnitude;
         double lf = Math.sin(theta - (Math.PI/4)) * magnitude;
         double rb = Math.sin(theta - (Math.PI/4)) * magnitude;
@@ -75,6 +102,8 @@ public class DriveMain2 extends OpMode {
         else{
             intake.stop();
         }
+
+
 
 
         telemetry.update();

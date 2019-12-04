@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -58,15 +59,20 @@ public class BlueParkAuto extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private Mecanum mecanum;
+    private Servo stoneArm;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Starting...");
         telemetry.update();
         mecanum = new Mecanum(hardwareMap);
+        stoneArm = hardwareMap.get(Servo.class, "stoneArm");
+        waitForStart();
+
         mecanum.moveStrafe(-24,.4);
         waitForEncoders();
-        telemetry.update();
+
+
 
     }
     public void twait(long millis) throws InterruptedException{
@@ -79,7 +85,7 @@ public class BlueParkAuto extends LinearOpMode {
     }
 
     public void waitForEncoders(){
-        while(!mecanum.encoderDone()&&opModeIsActive());
+        while(!mecanum.oneEncoderDone()&&opModeIsActive());
         mecanum.resetEncoders();
     }
 }

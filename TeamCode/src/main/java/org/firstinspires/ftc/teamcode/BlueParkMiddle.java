@@ -51,9 +51,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="RedParkAuto")
+@Autonomous(name="BlueParkMiddle")
 
-public class RedParkAuto extends LinearOpMode {
+public class BlueParkMiddle extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -65,7 +65,9 @@ public class RedParkAuto extends LinearOpMode {
         telemetry.update();
         mecanum = new Mecanum(hardwareMap);
         waitForStart();
-        mecanum.moveStrafe(24,.4);
+        mecanum.moveEncoderStraight(18,.4);
+        waitForEncoders();
+        mecanum.moveStrafe(-24,.4);
         waitForEncoders();
         telemetry.update();
 

@@ -234,8 +234,12 @@ public class Mecanum {
      * Encoders are done
      * @return whether or not any of the 4 drive encoders is busy
      */
-    public boolean encoderDone(){
+    public boolean threeEncoderDone(){
         return ((leftFront.isBusy()?1:0) + (leftRear.isBusy()?1:0) + (rightFront.isBusy()?1:0) + (rightRear.isBusy()?1:0))<= 1;
+    }
+
+    public boolean oneEncoderDone(){
+        return(leftFront.isBusy()?1:0) <1;
     }
 
     /**
