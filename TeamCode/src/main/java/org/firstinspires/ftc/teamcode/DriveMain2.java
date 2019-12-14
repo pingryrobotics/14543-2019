@@ -84,11 +84,8 @@ public class DriveMain2 extends OpMode {
         else if(gamepad1.b){
             foundation.moveDown();
         }
-        if(gamepad1.left_bumper){
-            intake.moveRampUp();
-        }
-        if(gamepad1.right_bumper){
-            intake.moveRampDown();
+        if(gamepad1.x){
+            stoneArm.setPosition(.4);
         }
         if (gamepad1.right_trigger >= 0.3){
             intake.intake(gamepad1.right_trigger);

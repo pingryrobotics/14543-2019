@@ -56,12 +56,7 @@ public class DriveMain extends OpMode {
         else if(gamepad1.b){
             foundation.moveDown();
         }
-        else if(gamepad1.right_bumper){
-            intake.moveRampUp();
-        }
-        else if(gamepad1.left_bumper){
-            intake.moveRampDown();
-        }
+
         while(gamepad1.right_trigger >= 0.3){
             intake.intake(gamepad1.right_trigger);
         }

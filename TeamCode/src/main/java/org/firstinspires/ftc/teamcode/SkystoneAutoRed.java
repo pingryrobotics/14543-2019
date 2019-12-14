@@ -126,44 +126,76 @@ public class SkystoneAutoRed extends LinearOpMode {
                 telemetry.addData("Width", cols);
 
                 telemetry.update();
-                mecanum.moveStrafe(42,.4);
-                waitForEncoders();
+                //move toward stones
+                mecanum.rawMove(.4,-.4,-.4,.4);
+                twait(2600);
+                mecanum.stop();
+                twait(700);
                 detected = true;
-                waitForEncoders();
+
+                mecanum.moveEncoderStraight(19.5,.5);
                 stoneArm.setPosition(.4);
-                mecanum.moveStrafe(-42,.4);
-                mecanum.moveEncoderStraight(55,.4);
+                twait(600);
+                mecanum.moveStrafe(-12,.4);
+                waitForEncoders();
+                mecanum.moveEncoderStraight(-55,.6);
+                waitForEncoders();
+                stoneArm.setPosition(.9);
+                twait(600);
+                mecanum.moveEncoderStraight(16,.6);
+                waitForEncoders();
+                mecanum.moveStrafe(-5,.4);
+                waitForEncoders();
             }
             else if(valMid == 0){
                 telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
-
-                telemetry.update();
-                mecanum.moveStrafe(42,.4);
-                waitForEncoders();
-                mecanum.moveEncoderStraight(8,.3);
                 detected = true;
+                telemetry.update();
+
+                mecanum.rawMove(.4,-.4,-.4,.4);
+                twait(2750);
+                mecanum.stop();
+                twait(700);
+                mecanum.moveEncoderStraight(4,.4);
+                waitForEncoders();
                 stoneArm.setPosition(.4);
-                mecanum.moveStrafe(-42,.4);
-                mecanum.moveEncoderStraight(47,.4);
+                twait(600);
+                mecanum.moveStrafe(-12,.4);
+                waitForEncoders();
+                mecanum.moveEncoderStraight(-55,.6);
+                waitForEncoders();
+                stoneArm.setPosition(.9);
+                twait(600);
+                mecanum.moveEncoderStraight(16,.6);
+                waitForEncoders();
+                mecanum.moveStrafe(-5,.4);
+                waitForEncoders();
 
             }
             else if(valRight==0){
                 telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
-
-                telemetry.update();
-                mecanum.moveStrafe(42,.4);
-                waitForEncoders();
                 detected = true;
-                mecanum.moveEncoderStraight(16,.4);
+                telemetry.update();
+                mecanum.rawMove(.4,-.4,-.4,.4);
+                twait(2800);
+                mecanum.stop();
+                twait(200);
+                mecanum.moveEncoderStraight(4,.4);
                 waitForEncoders();
                 stoneArm.setPosition(.4);
-                twait(2000);
-                mecanum.moveStrafe(-42,.4);
-                mecanum.moveEncoderStraight(38,.4);
+                twait(600);
+                mecanum.moveStrafe(-12,.4);
+                waitForEncoders();
+                stoneArm.setPosition(.9);
+                twait(600);
+                mecanum.moveEncoderStraight(12,.4);
+                waitForEncoders();
+                mecanum.moveStrafe(-5,.4);
+                waitForEncoders();
             }
 
         }
