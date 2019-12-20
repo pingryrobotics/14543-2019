@@ -3,6 +3,8 @@
  */
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -11,16 +13,40 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.*;
+import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.RevBulkData;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.kinematics.MecanumKinematics;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.Thread.*;
 import static java.lang.Thread.sleep;
 
 
 public class Mecanum {
-    public DcMotor rightRear = null;
-    public DcMotor rightFront = null;
-    public DcMotor leftRear = null;
-    public DcMotor leftFront = null;
+    public enum Mode {
+        IDLE,
+        FOLLOW_TRAJECTORY,
+        RUN_TO_POSE
+    }
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(.2,0.001,.01);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(.2,0.001,0.01);
+    public PIDFController xTranslationController = new PIDFController(TRANSLATIONAL_PID);
+    public PIDFController yTranslationController = new PIDFController(TRANSLATIONAL_PID);
+    public PIDFController headingController = new PIDFController(HEADING_PID);
+    public ExpansionHubMotor rightRear = null;
+    public ExpansionHubMotor rightFront = null;
+    public ExpansionHubMotor leftRear = null;
+    public ExpansionHubMotor leftFront = null;
+    private List<ExpansionHubMotor> motors;
+    private final double TRACK_WIDTH = 15;
+    private final double WHEEL_BASE = 11.25;
 
     private final double ticksPerInch = 28*25/(4*Math.PI);//encoder ticks to inches: 2 * 2pi * 1/25 * ticks/28 ;//28 / Math.PI;//1120 * 20 / (4 * Math.PI);
 
@@ -29,16 +55,25 @@ public class Mecanum {
     private double lastAngle = 0;
     private double averageVelocity = 0;
     private double averageGoal = 0;
+    private Pose2d m_currentDesiredPose;
+    public double dt;
+    private double prevTime;
+    private double currTime;
     private ElapsedTime t;
+    private ElapsedTime odomTime;
+    private Pose2d currentPose = new Pose2d(0,0,0);
+    public Mode mode;
+    private ExpansionHubEx hub;
+    private Pose2d robotVelocity = new Pose2d(0,0,0);
 
 
     public Mecanum(HardwareMap h){
-
-        rightRear = h.get(DcMotor.class, "backRight");
-        leftFront = h.get(DcMotor.class, "frontLeft");
-        rightFront = h.get(DcMotor.class, "frontRight");
-        leftRear = h.get(DcMotor.class, "backLeft");
-
+        hub = h.get(ExpansionHubEx.class, "controlHub");
+        rightRear = h.get(ExpansionHubMotor.class, "backRight");
+        leftFront = h.get(ExpansionHubMotor.class, "frontLeft");
+        rightFront = h.get(ExpansionHubMotor.class, "frontRight");
+        leftRear = h.get(ExpansionHubMotor.class, "backLeft");
+        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
@@ -52,10 +87,36 @@ public class Mecanum {
         resetEncoders();
 
         t = new ElapsedTime();
+        odomTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        prevTime = odomTime.time()/(double)1000;
     }
+    public List<Double> getWheelVelocities() {
+        RevBulkData bulkData = hub.getBulkInputData();
 
+        if (bulkData == null) {
+            return Arrays.asList(0.0, 0.0, 0.0, 0.0);
+        }
+
+        List<Double> wheelVelocities = new ArrayList<>();
+        for (ExpansionHubMotor motor : motors) {
+            wheelVelocities.add(bulkData.getMotorVelocity(motor)/ticksPerInch);
+            //wheelVelocities.add((double)bulkData.getMotorVelocity(motor));
+        }
+        return wheelVelocities;
+    }
     public double targetPosition(double inches){
         return inches*ticksPerInch;
+    }
+    public void updateOdometry(){
+        List<Double> wheelVelocities = this.getWheelVelocities();
+        currTime = odomTime.time()/(double)1000;
+        dt = currTime - prevTime;
+        prevTime = currTime;
+        Pose2d robotRelativeVelocity = MecanumKinematics.wheelToRobotVelocities(wheelVelocities, TRACK_WIDTH, WHEEL_BASE);
+        robotVelocity = robotRelativeVelocity;
+        Pose2d fieldRelativeVelocity = new Pose2d(new Vector2d(robotRelativeVelocity.getX(),robotRelativeVelocity.getY()).rotated(this.getRawExternalHeading()),robotRelativeVelocity.getHeading());
+        Pose2d poseDelta = fieldRelativeVelocity.times(dt);
+        currentPose = currentPose.plus(poseDelta);
     }
     public void move(Gamepad gamepad){
         /*double theta = Math.atan2(gamepad.left_stick_x, gamepad.left_stick_y)+(Math.PI/4);
@@ -229,6 +290,62 @@ public class Mecanum {
         System.out.println("Turn power: "+driveAngle);
         drive(0, 0, driveAngle);
     }
+    public boolean isBusy() {
+        return mode != Mode.IDLE;
+    }
+    public void update(){
+        updateOdometry();
+        if (mode == Mode.RUN_TO_POSE){
+            if (isInRange()){
+                setMotorPowers(0,0,0,0);
+                mode = Mode.IDLE;
+            }
+            else {
+                List<Double> powers = MecanumKinematics.robotToWheelVelocities(new Pose2d(xTranslationController.update(currentPose.getX(), robotVelocity.getX()),
+                        yTranslationController.update(currentPose.getY(), robotVelocity.getY()),
+                        headingController.update(currentPose.getHeading(), robotVelocity.getHeading())),TRACK_WIDTH,WHEEL_BASE);
+                setMotorPowers(powers.get(0),powers.get(1),powers.get(2),powers.get(3));
+            }
+        }
+    }
+    public void runToPose(Pose2d desiredPose){
+        xTranslationController.reset();
+        yTranslationController.reset();
+        headingController.reset();
+        xTranslationController.setTargetPosition(desiredPose.getX());
+        yTranslationController.setTargetPosition(desiredPose.getY());
+        headingController.setTargetPosition(desiredPose.getHeading());
+        xTranslationController.update(currentPose.getX(), robotVelocity.getX());
+        yTranslationController.update(currentPose.getY(), robotVelocity.getY());
+        headingController.update(currentPose.getHeading(), robotVelocity.getHeading());
+    }
+    public void runToPoseSync(Pose2d desiredPose){
+        mode = Mode.RUN_TO_POSE;
+        m_currentDesiredPose = desiredPose;
+        runToPose(desiredPose);
+        waitForIdle();
+    }
+    public void waitForIdle(){
+        while(!Thread.currentThread().isInterrupted()&&isBusy()){
+            update();
+        }
+    }
+    public boolean isInRange(){
+        boolean inRange = true;
+        if(Math.abs(headingController.getLastError()) > .15){
+            inRange = false;
+        }
+        if(Math.abs(xTranslationController.getLastError()) > .3) {
+            inRange = false;
+        }
+        if(Math.abs(yTranslationController.getLastError()) > .3){
+            inRange = false;
+        }
+        return inRange;
+    }
+    public double getRawExternalHeading() {
+        return imu.getAngularOrientation().firstAngle;
+    }
 
     /**
      * Encoders are done
@@ -237,7 +354,12 @@ public class Mecanum {
     public boolean threeEncoderDone(){
         return ((leftFront.isBusy()?1:0) + (leftRear.isBusy()?1:0) + (rightFront.isBusy()?1:0) + (rightRear.isBusy()?1:0))<= 1;
     }
-
+    public void setMotorPowers(double v, double v1, double v2, double v3) {
+        leftFront.setPower(v);
+        leftRear.setPower(v1);
+        rightRear.setPower(v2);
+        rightFront.setPower(v3);
+    }
     public boolean oneEncoderDone(){
         return(leftFront.isBusy()?1:0) <1;
     }
