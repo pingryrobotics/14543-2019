@@ -85,6 +85,9 @@ public class DriveMain2 extends OpMode {
             foundation.moveDown();
         }
         if(gamepad1.x){
+            stoneArm.setPosition(.9);
+        }
+        if(gamepad1.a){
             stoneArm.setPosition(.4);
         }
         if (gamepad1.right_trigger >= 0.3){

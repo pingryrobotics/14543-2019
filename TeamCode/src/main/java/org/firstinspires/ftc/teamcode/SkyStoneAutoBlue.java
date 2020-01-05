@@ -36,7 +36,7 @@ import java.util.List;
  * monitor: 640 x 480
  *YES
  */
-@Autonomous(name= "SkystoneAutoBlue", group="Sky autonomous")
+@Autonomous(name= "SkyStoneAutoBlue", group="Sky autonomous")
 //@Disabled//comment out this line before using
 public class SkyStoneAutoBlue extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
@@ -50,8 +50,8 @@ public class SkyStoneAutoBlue extends LinearOpMode {
     private static float rectHeight = .6f/8f;
     private static float rectWidth = 1.5f/8f;
 
-    private static float offsetX = -1f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
-    private static float offsetY = .4f/8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
+    private static float offsetX = 1.9f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
+    private static float offsetY = -2.7f/8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
 
     private static float[] midPos = {4f/8f+offsetX, 4f/8f+offsetY};//0 = col, 1 = row
     private static float[] leftPos = {2f/8f+offsetX, 4f/8f+offsetY};
@@ -59,7 +59,7 @@ public class SkyStoneAutoBlue extends LinearOpMode {
     //moves all rectangles right or left by amount. units are in ratio to monitor
 
     private final int rows = 320;
-    private final int cols = 100;
+    private final int cols = 240;
 
     OpenCvCamera webcam;
     private Mecanum mecanum;
@@ -109,9 +109,8 @@ public class SkyStoneAutoBlue extends LinearOpMode {
         runtime.reset();
 
         boolean detected = false;
-        //mecanum.moveEncoderStraight(-4.5,.4);
-        //waitForEncoders();
-        while (!detected && opModeIsActive()) {
+
+        while (!detected) {
             telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
             telemetry.addData("Height", rows);
             telemetry.addData("Width", cols);
@@ -128,22 +127,28 @@ public class SkyStoneAutoBlue extends LinearOpMode {
 
                 telemetry.update();
                 //move toward stones
+                mecanum.moveEncoderStraight(-2,.4);
+                waitForEncoders();
                 mecanum.rawMove(-.4,.4,.4,-.4);
-                twait(2600);
+                twait(2950);
                 mecanum.stop();
                 twait(700);
                 detected = true;
 
-                mecanum.moveEncoderStraight(-19.5,.5);
+                // mecanum.moveEncoderStraight(19.5,.5);
                 stoneArm.setPosition(.4);
                 twait(600);
-                mecanum.moveStrafe(12,.4);
+                mecanum.moveStrafe(19,.4);
                 waitForEncoders();
-                mecanum.moveEncoderStraight(55,.6);
+                //mecanum.rawMove(.4,-.4,-.4,.4);
+                //twait(3000);
+                //mecanum.stop();
+                //twait(200);
+                mecanum.moveEncoderStraight(-55,.6);
                 waitForEncoders();
                 stoneArm.setPosition(.9);
                 twait(600);
-                mecanum.moveEncoderStraight(-16,.6);
+                mecanum.moveEncoderStraight(16,.6);
                 waitForEncoders();
                 mecanum.moveStrafe(5,.4);
                 waitForEncoders();
@@ -156,46 +161,59 @@ public class SkyStoneAutoBlue extends LinearOpMode {
                 telemetry.addData("Width", cols);
                 detected = true;
                 telemetry.update();
-
+                mecanum.moveEncoderStraight(7.5,.4);
+                waitForEncoders();
                 mecanum.rawMove(-.4,.4,.4,-.4);
-                twait(2750);
+                twait(2970);
                 mecanum.stop();
                 twait(700);
-                mecanum.moveEncoderStraight(-4,.4);
+
                 waitForEncoders();
                 stoneArm.setPosition(.4);
-                twait(600);
-                mecanum.moveStrafe(12,.4);
+                twait(700);
+               mecanum.moveStrafe(19,.4);
                 waitForEncoders();
-                mecanum.moveEncoderStraight(55,.6);
+                //mecanum.rawMove(.4,-.4,-.4,.4);
+                //twait(3000);
+                //mecanum.stop();
+                //twait(200);
+                mecanum.moveEncoderStraight(-55,.6);
                 waitForEncoders();
                 stoneArm.setPosition(.9);
                 twait(600);
-                mecanum.moveEncoderStraight(-16,.6);
+                mecanum.moveEncoderStraight(16,.6);
                 waitForEncoders();
                 mecanum.moveStrafe(5,.4);
                 waitForEncoders();
 
             }
-            else if(valRight==0){
+            else{
                 telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
                 telemetry.addData("Height", rows);
                 telemetry.addData("Width", cols);
                 detected = true;
                 telemetry.update();
+                mecanum.moveEncoderStraight(15,.4);
+                waitForEncoders();
                 mecanum.rawMove(-.4,.4,.4,-.4);
-                twait(2800);
+                twait(2990);
                 mecanum.stop();
                 twait(200);
-                mecanum.moveEncoderStraight(-4,.4);
+
                 waitForEncoders();
                 stoneArm.setPosition(.4);
                 twait(600);
-                mecanum.moveStrafe(12,.4);
+               mecanum.moveStrafe(19,.4);
+                waitForEncoders();
+                //mecanum.rawMove(.4,-.4,-.4,.4);
+                //twait(3000);
+                //mecanum.stop();
+                //twait(200);
+                mecanum.moveEncoderStraight(-55,.4);
                 waitForEncoders();
                 stoneArm.setPosition(.9);
                 twait(600);
-                mecanum.moveEncoderStraight(-12,.4);
+                mecanum.moveEncoderStraight(16,.4);
                 waitForEncoders();
                 mecanum.moveStrafe(5,.4);
                 waitForEncoders();
@@ -215,6 +233,8 @@ public class SkyStoneAutoBlue extends LinearOpMode {
             }
 
         }
+
+
 
     }
     public void waitForEncoders(){
@@ -363,48 +383,4 @@ public class SkyStoneAutoBlue extends LinearOpMode {
     }
 }
 
-class SamplePipeline extends OpenCvPipeline
-{
-    /*
-     * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
-     * highly recommended to declare them here as instance variables and re-use them for
-     * each invocation of processFrame(), rather than declaring them as new local variables
-     * each time through processFrame(). This removes the danger of causing a memory leak
-     * by forgetting to call mat.release(), and it also reduces memory pressure by not
-     * constantly allocating and freeing large chunks of memory.
-     */
-
-    @Override
-    public Mat processFrame(Mat input)
-    {
-        /*
-         * IMPORTANT NOTE: the input Mat that is passed in as a parameter to this method
-         * will only dereference to the same image for the duration of this particular
-         * invocation of this method. That is, if for some reason you'd like to save a copy
-         * of this particular frame for later use, you will need to either clone it or copy
-         * it to another Mat.
-         */
-
-        /*
-         * Draw a simple box around the middle 1/2 of the entire frame
-         */
-        Imgproc.rectangle(
-                input,
-                new Point(
-                        input.cols()/4,
-                        input.rows()/4),
-                new Point(
-                        input.cols()*(3f/4f),
-                        input.rows()*(3f/4f)),
-                new Scalar(0, 255, 0), 4);
-
-        /**
-         * NOTE: to see how to get data from your pipeline to your OpMode as well as how
-         * to change which stage of the pipeline is rendered to the viewport when it is
-         * tapped, please see {@link PipelineStageSwitchingExample}
-         */
-
-        return input;
-    }
-}
 

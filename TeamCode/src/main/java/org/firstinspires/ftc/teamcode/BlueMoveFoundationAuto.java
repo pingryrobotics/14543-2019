@@ -69,20 +69,23 @@ public class BlueMoveFoundationAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        mecanum.moveStrafe(-10,.3);
+        mecanum.moveStrafe(-18.5,.3);
         waitForEncoders();
         mecanum.moveEncoderStraight(35,.4);
         waitForEncoders();
         foundation.moveDown();
         twait(500);
-        mecanum.moveEncoderStraight(-35,.4);
+        mecanum.moveEncoderStraight(-38,.4);
         waitForEncoders();
         foundation.moveUp();
+        mecanum.rawMove(.4,.4,.4,.4);
+        twait(100);
+        mecanum.stop();
         /*mecanum.rawMove(.2,.2,.2,.2);
         twait(300);
         mecanum.stop();
         */
-        mecanum.moveStrafe(49,.3);
+        mecanum.moveStrafe(56,.3);
         waitForEncoders();
 
         telemetry.addData("rightRear encoder position", mecanum.rightRearEncoderPosition());
@@ -100,7 +103,8 @@ public class BlueMoveFoundationAuto extends LinearOpMode {
     }
 
     public void waitForEncoders(){
-        while(!mecanum.threeEncoderDone()&&opModeIsActive());
+        while(!mecanum.threeEncoderDone()&&opModeIsActive()&&runtime.milliseconds()<6000);
         mecanum.resetEncoders();
+        runtime.reset();
     }
 }
